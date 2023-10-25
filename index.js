@@ -3,6 +3,7 @@ const path = require('path');
 const authRouter = require('./routes/authRouter');
 const CustomError = require('./Utils/CustomError');
 const globalErrorHandler = require('./controller/errorController')
+const cors = require('cors'); // Import the cors module
 
 const port = 8000;
 
@@ -10,11 +11,10 @@ const db = require('./config/mongoose')
 
 const app = express();
 app.use(express.json());
-// app.use(express.urlencoded());
-
-app.get('/' , function(req, res) {
-    res.send("<h1>hello! world</h1>")
-})
+app.use(cors({
+    origin: 'http://localhost:3000', // Replace with the actual URL of your frontend app
+    credentials: true, // Allow credentials (cookies, HTTP authentication)
+  }));
 
 app.use('/api/v1/users', authRouter);
 app.all('*', (req, res, next) => {
