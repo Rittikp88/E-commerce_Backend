@@ -1,56 +1,49 @@
-class Apifeatures{
-    constructor(query, queryStr){
-        this.query = query;
-        this.queryStr = queryStr;
+class ApiFeatures {
+    constructor(query, queryStr) {
+      this.query = query;
+      this.queryStr = queryStr;
     }
-
-    filter(){
-        let queryString = JSON.stringify(this.queryStr);
-        queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-        const queryObj = JSON.parse(queryString);
-
-        this.query = this.query.find(queryObj);
-
-        return this;
+  
+    search() {
+      const keyword = this.queryStr.keyword
+        ? {
+            name: {
+              $regex: this.queryStr.keyword,
+              $options: "i",
+            },
+          }
+        : {};
+  
+      this.query = this.query.find({ ...keyword });
+      return this;
     }
-
-    sort(){
-        if(this.queryStr.sort){
-            const sortBy = this.queryStr.sort.split(',').join(' ');
-            this.query = this.query.sort(sortBy);
-        }else{
-            this.query = this.query.sort('-createdAt');
-        }
-
-        return this;
+  
+    filter() {
+      const queryCopy = { ...this.queryStr };
+      //   Removing some fields for category
+      const removeFields = ["keyword", "page", "limit"];
+  
+      removeFields.forEach((key) => delete queryCopy[key]);
+  
+      // Filter For Price and Rating
+  
+      let queryStr = JSON.stringify(queryCopy);
+      queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
+  
+      this.query = this.query.find(JSON.parse(queryStr));
+  
+      return this;
     }
-
-    limitFields(){
-        if(this.queryStr.fields){
-            const fields = this.queryStr.fields.split(',').join(' ');
-            this.query = this.query.select(fields);
-        }else{
-            this.query = this.query.select('-__v');
-        }
-
-        return this;
+  
+    pagination(resultPerPage) {
+      const currentPage = Number(this.queryStr.page) || 1;
+  
+      const skip = resultPerPage * (currentPage - 1);
+  
+      this.query = this.query.limit(resultPerPage).skip(skip);
+  
+      return this;
     }
-
-    paginate(){
-        const page = this.queryStr.page*1 || 1;
-        const limit = this.queryStr.limit*1 || 10;
-        const skip = (page -1) * limit;
-        this.query = this.query.skip(skip).limit(limit);
-
-        // if(this.queryStr.page){
-        //     const moviesCount = await Movie.countDocuments();
-        //     if(skip >= moviesCount){
-        //         throw new Error("This page is not found!");
-        //     }
-        // }
-
-        return this;
-    }
-}
-
-module.exports = Apifeatures;
+  }
+  
+  module.exports = ApiFeatures;
