@@ -26,7 +26,7 @@ exports.login = catchAsyncErrors(async(req, res , next) => {
         return next(new ErrorHandler("Please provide email Id & Password for login in!",404))
     }
 
-    const user = await User.findOne({email}).select('password');
+    const user = await User.findOne({email}).select('password').select('name').select('email').select('role');
 
     const isMatch = await user.comparePasswordInDb(password, user.password);
 
