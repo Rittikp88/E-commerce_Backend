@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const authRouter = require('./routes/authRouter');
 const product = require("./routes/productRouter");
+const order = require('./routes/orderRouter');
 const ErrorHandler = require('./Utils/errorhandler');
 const errorMiddleware = require('./middleware/error');
 const cookieParser = require("cookie-parser");
@@ -22,6 +23,7 @@ app.use(cors({
 
 app.use('/api/v1/users', authRouter);
 app.use('/api/v1/users', product);
+app.use('/api/v1/users', order);
 app.all('*', (req, res, next) => {
     // res.status(404).json({
     //     status: 'fail',
