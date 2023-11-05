@@ -18,20 +18,43 @@ exports.createProducts = catchAsyncErrors(async (req, res, next) => {
 //Get All Product
 exports.getAllProducts = catchAsyncErrors(async(req, res) => {
 
-  const resultPerPage = 8;
+  // const resultPerPage = 8;
+  // const productsCount = await Product.countDocuments();
+
+  // const apiFeature = new ApiFeatures(Product.find(), req.query)
+  //   .search()
+  //   .filter();
+
+  //   apiFeature.pagination(resultPerPage);
+  // let products = await apiFeature.query;
+
+  // let filteredProductsCount = products.length;
+
+
+  // // products = await apiFeature.query;
+
+  // res.status(200).json({
+  //   success: true,
+  //   products,
+  //   productsCount,
+  //   resultPerPage,
+  //   filteredProductsCount,
+  // });
+  const resultPerPage = 9;
   const productsCount = await Product.countDocuments();
 
   const apiFeature = new ApiFeatures(Product.find(), req.query)
     .search()
     .filter();
 
+  
+
+  apiFeature.pagination(resultPerPage);
   let products = await apiFeature.query;
 
   let filteredProductsCount = products.length;
 
-  apiFeature.pagination(resultPerPage);
-
-  products = await apiFeature.query;
+  // products = await apiFeature.query;
 
   res.status(200).json({
     success: true,
@@ -72,7 +95,9 @@ exports.getAdminProducts = catchAsyncErrors(async(req, res) => {
 
 // Get Product Details
 exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
+  console.log("gdahgfdhgasdfg",req.params.id)
     const product = await Product.findById(req.params.id);
+    console.log(product);
   
     if (!product) {
       return next(new ErrorHander("Product not found", 404));
@@ -81,7 +106,6 @@ exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       product,
-      productCount,
     });
   });
 
